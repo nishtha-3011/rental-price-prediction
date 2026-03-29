@@ -6,7 +6,7 @@ using XGBoost, trained on real Airbnb listing data.
 ---
 
 ## 🌐 Live Demo
-[Click here to open the website](https://nishtha-3011.github.io/rental-price-prediction/rental_prediction_website.html)
+[Click here to open the website](https://nishtha-3011.github.io/rental-price-prediction/)
 
 ---
 
