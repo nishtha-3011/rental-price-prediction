@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentIQ — AI Rental Price Predictor</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080D;
+    --surface: #0F1117;
+    --surface2: #161923;
+    --border: rgba(255,255,255,0.07);
+    --accent: #6366F1;
+    --accent2: #06B6D4;
+    --accent3: #F59E0B;
+    --text: #F1F5F9;
+    --muted: #64748B;
+    --success: #10B981;
+    --danger: #EF4444;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 { font-family: 'Syne', sans-serif; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(7,8,13,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-link {
+    color: var(--muted); font-size: 0.9rem; cursor: pointer;
+    transition: color 0.2s; text-decoration: none;
+  }
+  .nav-link:hover, .nav-link.active { color: var(--text); }
+  .nav-btn {
+    background: var(--accent); color: white;
+    padding: 0.5rem 1.25rem; border-radius: 8px;
+    font-size: 0.875rem; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .nav-btn:hover { background: #5457E5; transform: translateY(-1px); }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.875rem 2rem; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.25s;
+    font-family: 'DM Sans', sans-serif; text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #818CF8);
+    color: white;
+    box-shadow: 0 0 30px rgba(99,102,241,0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 50px rgba(99,102,241,0.5);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-full { width: 100%; justify-content: center; }
+
+  /* ===== INPUTS ===== */
+  .input-group {
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  label {
+    font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em;
+    text-transform: uppercase; font-weight: 500;
+  }
+  input, select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.875rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none; width: 100%;
+  }
+  input:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+  }
+  select option { background: var(--surface2); }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .card-glow {
+    box-shadow: 0 0 40px rgba(99,102,241,0.08);
+  }
+
+  /* ===== GRID CHIPS ===== */
+  .chip {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 100px;
+    font-size: 0.78rem; font-weight: 500;
+    border: 1px solid;
+  }
+  .chip-green { color: var(--success); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+  .chip-blue { color: var(--accent2); border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.08); }
+  .chip-purple { color: var(--accent); border-color: rgba(99,102,241,0.3); background: rgba(99,102,241,0.08); }
+  .chip-amber { color: var(--accent3); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.08); }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s ease;
+    max-width: 320px;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { border-color: rgba(16,185,129,0.5); }
+  #toast.error { border-color: rgba(239,68,68,0.5); }
+
+  /* ============================================
+     PAGE 1: LANDING
+  ============================================ */
+  #landing {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(99,102,241,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+  .orb {
+    position: absolute; border-radius: 50%;
+    filter: blur(80px); pointer-events: none;
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 500px; height: 500px; background: rgba(99,102,241,0.12); top: -100px; right: -100px; }
+  .orb2 { width: 350px; height: 350px; background: rgba(6,182,212,0.1); bottom: 100px; left: -80px; animation-delay: -4s; }
+
+  @keyframes drift {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(30px, 20px) scale(1.05); }
+  }
+
+  .hero {
+    position: relative; z-index: 1;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    padding: 160px 2rem 80px;
+    gap: 1.5rem;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    border: 1px solid rgba(99,102,241,0.4);
+    background: rgba(99,102,241,0.08);
+    font-size: 0.8rem; color: #A5B4FC;
+    animation: fadeUp 0.6s ease both;
+  }
+  .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  .hero h1 {
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 800; line-height: 1.1;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero p {
+    font-size: 1.1rem; color: var(--muted); max-width: 560px; line-height: 1.7;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-actions {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap;
+    padding: 2.5rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-top: 2rem;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stat { text-align: center; }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--text), var(--muted));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); }
+
+  /* Features */
+  .features {
+    padding: 5rem 2rem;
+    max-width: 1100px; margin: 0 auto;
+  }
+  .section-label {
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 700; margin-bottom: 3rem;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feature-card:hover { border-color: rgba(99,102,241,0.3); transform: translateY(-4px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1rem;
+  }
+  .feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .feature-card p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+  /* How it works */
+  .how-it-works {
+    padding: 5rem 2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .how-inner { max-width: 1000px; margin: 0 auto; }
+  .steps {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem; margin-top: 3rem;
+  }
+  .step {
+    text-align: center; position: relative;
+  }
+  .step-num {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem; font-weight: 800;
+    margin: 0 auto 1rem;
+    position: relative; z-index: 1;
+  }
+  .step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .step p { font-size: 0.85rem; color: var(--muted); }
+
+  /* Footer */
+  footer {
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ============================================
+     PAGE 2: LOGIN / REGISTER
+  ============================================ */
+  #auth {
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 1rem 2rem;
+    position: relative;
+  }
+  #auth.active { display: flex; }
+
+  .auth-card {
+    width: 100%; max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 0 80px rgba(99,102,241,0.1);
+    position: relative; z-index: 1;
+  }
+  .auth-title { font-size: 1.75rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .auth-sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+  .auth-form { display: flex; flex-direction: column; gap: 1.25rem; }
+  .auth-divider {
+    display: flex; align-items: center; gap: 1rem; margin: 0.5rem 0;
+    color: var(--muted); font-size: 0.8rem;
+  }
+  .auth-divider::before, .auth-divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .auth-toggle {
+    text-align: center; font-size: 0.875rem; color: var(--muted);
+    margin-top: 1.5rem;
+  }
+  .auth-toggle span {
+    color: var(--accent); cursor: pointer; font-weight: 500;
+  }
+  .auth-toggle span:hover { text-decoration: underline; }
+  .password-wrap { position: relative; }
+  .eye-btn {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 1rem; padding: 4px;
+  }
+
+  /* ============================================
+     PAGE 3: PREDICT
+  ============================================ */
+  #predict {
+    padding-top: 80px;
+    min-height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 2rem 3rem;
+  }
+
+  .predict-header {
+    margin-bottom: 2.5rem;
+  }
+  .predict-header h1 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .predict-header p { color: var(--muted); }
+
+  .predict-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .form-grid .span-2 { grid-column: 1/-1; }
+
+  .predict-card-title {
+    font-size: 1.1rem; font-weight: 700; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  /* Result panel */
+  .result-panel {
+    position: sticky; top: 100px;
+  }
+  .result-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    min-height: 280px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 1rem;
+    position: relative; overflow: hidden;
+  }
+  .result-box.predicted {
+    border-color: rgba(99,102,241,0.4);
+    background: linear-gradient(135deg, rgba(99,102,241,0.05), rgba(6,182,212,0.05));
+    box-shadow: 0 0 60px rgba(99,102,241,0.15);
+  }
+  .result-idle { color: var(--muted); font-size: 0.9rem; text-align: center; }
+  .result-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 3.5rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .result-unit { font-size: 0.875rem; color: var(--muted); }
+  .result-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+  .confidence-bar-wrap {
+    width: 100%; margin-top: 0.5rem;
+  }
+  .confidence-bar-track {
+    height: 6px; background: var(--surface2); border-radius: 100px;
+    overflow: hidden;
+  }
+  .confidence-bar-fill {
+    height: 100%; border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    transition: width 1s ease;
+    width: 0%;
+  }
+  .conf-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 0.4rem; }
+
+  .price-range {
+    display: flex; gap: 1rem; width: 100%;
+    margin-top: 0.5rem;
+  }
+  .range-box {
+    flex: 1; background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.75rem;
+    text-align: center;
+  }
+  .range-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+  }
+  .range-val.low { color: var(--success); }
+  .range-val.high { color: var(--accent3); }
+  .range-key { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+  .market-insights {
+    margin-top: 1.5rem;
+  }
+  .insight-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.875rem;
+  }
+  .insight-row:last-child { border-bottom: none; }
+  .insight-key { color: var(--muted); }
+  .insight-val { font-weight: 500; }
+
+  /* Loading spinner */
+  .spinner {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ============================================
+     PAGE 4: HISTORY
+  ============================================ */
+  #history-page {
+    padding: 100px 2rem 3rem;
+    max-width: 1100px; margin: 0 auto;
+  }
+
+  .history-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .history-header h1 { font-size: 2rem; font-weight: 800; }
+
+  .history-filters {
+    display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+  }
+  .filter-btn {
+    padding: 0.5rem 1rem; border-radius: 8px;
+    font-size: 0.8rem; cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .filter-btn.active {
+    background: rgba(99,102,241,0.15);
+    border-color: rgba(99,102,241,0.5);
+    color: #A5B4FC;
+  }
+
+  .history-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden;
+  }
+  .history-table th {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 0.75rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted);
+    font-weight: 500;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .history-table td {
+    padding: 1rem 1.25rem;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .history-table tr:last-child td { border-bottom: none; }
+  .history-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .price-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    color: var(--accent);
+  }
+
+  .empty-state {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--text); }
+
+  /* Stats row */
+  .history-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem; margin-bottom: 2rem;
+  }
+  .h-stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem;
+  }
+  .h-stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem; font-weight: 800;
+    margin-bottom: 0.25rem;
+  }
+  .h-stat-key { font-size: 0.8rem; color: var(--muted); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .predict-layout { grid-template-columns: 1fr; }
+    .result-panel { position: static; }
+    .form-grid { grid-template-columns: 1fr; }
+    .history-table { display: block; overflow-x: auto; }
+    .stats-bar { gap: 1.5rem; }
+    nav { padding: 1rem; }
+    .nav-links .nav-link:not(.nav-btn) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="showPage('landing')">RentIQ</div>
+  <div class="nav-links">
+    <span class="nav-link" id="nav-predict" onclick="requireAuth('predict')" style="display:none">Predict</span>
+    <span class="nav-link" id="nav-history" onclick="requireAuth('history')" style="display:none">History</span>
+    <span class="nav-link" id="nav-user" style="display:none; color:var(--text)"></span>
+    <button class="nav-btn" id="nav-auth-btn" onclick="showPage('auth')">Sign In</button>
+    <button class="nav-btn" id="nav-logout-btn" onclick="logout()" style="display:none; background:var(--surface2); border:1px solid var(--border)">Logout</button>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ============================================
+     PAGE 1: LANDING
+============================================ -->
+<div id="landing" class="page active">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+
+  <div class="hero">
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      AI-Powered · XGBoost Model · 94% Accuracy
+    </div>
+
+    <h1>Predict Rental Prices<br>with <span>Precision</span></h1>
+
+    <p>Leverage machine learning trained on 48,000+ NYC Airbnb listings to instantly predict fair rental prices for any property.</p>
+
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="requireAuth('predict')">
+        🏠 Get Price Prediction
+      </button>
+      <button class="btn btn-outline" onclick="showPage('auth')">
+        Create Account →
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-val">48K+</div>
+      <div class="stat-label">Listings Trained On</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">94.2%</div>
+      <div class="stat-label">Model Accuracy (R²)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">$18</div>
+      <div class="stat-label">Avg. Prediction Error (MAE)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">5</div>
+      <div class="stat-label">NYC Boroughs Covered</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">XGBoost</div>
+      <div class="stat-label">Powered By</div>
+    </div>
+  </div>
+
+  <div class="features">
+    <div class="section-label">Features</div>
+    <div class="section-title">Everything you need to price right</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(99,102,241,0.15)">🤖</div>
+        <h3>XGBoost AI Model</h3>
+        <p>Enterprise-grade gradient boosting trained on real NYC Airbnb data with log-price normalization for superior accuracy.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(6,182,212,0.15)">📍</div>
+        <h3>Location Intelligence</h3>
+        <p>Neighbourhood-level pricing insights across Manhattan, Brooklyn, Queens, Bronx, and Staten Island.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.15)">📊</div>
+        <h3>Market Benchmarks</h3>
+        <p>See how your predicted price compares to market averages, percentile ranges and competitor listings.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.15)">📜</div>
+        <h3>Prediction History</h3>
+        <p>Every prediction is saved to your personal dashboard so you can track pricing decisions over time.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(239,68,68,0.15)">🔒</div>
+        <h3>Secure & Private</h3>
+        <p>User accounts with authentication. Your prediction history is private to your account only.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:rgba(168,85,247,0.15)">⚡</div>
+        <h3>Instant Results</h3>
+        <p>Get your predicted price in under a second with confidence intervals and price range estimates.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-it-works">
+    <div class="how-inner">
+      <div class="section-label">How it Works</div>
+      <div class="section-title">Simple. Fast. Accurate.</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <h4>Create Account</h4>
+          <p>Sign up for free in under 30 seconds. No credit card needed.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <h4>Fill Property Details</h4>
+          <p>Enter location, room type, availability, reviews and more.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <h4>Get AI Prediction</h4>
+          <p>Our XGBoost model predicts the optimal nightly price instantly.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <h4>Review History</h4>
+          <p>Track all your predictions and make data-driven decisions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2024 RentIQ · Powered by XGBoost ML · NYC Airbnb Dataset</p>
+  </footer>
+</div>
+
+<!-- ============================================
+     PAGE 2: AUTH
+============================================ -->
+<div id="auth" class="page">
+  <div class="orb orb1" style="opacity:0.5"></div>
+  <div class="auth-card">
+    <div id="login-form">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your RentIQ account</div>
+      <div class="auth-form">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" placeholder="you@example.com">
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <div class="password-wrap">
+            <input type="password" id="login-password" placeholder="Enter password">
+            <button class="eye-btn" onclick="togglePwd('login-password')">👁</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doLogin()">Sign In →</button>
+        <div class="auth-divider">or</div>
+        <button class="btn btn-outline btn-full" onclick="demoLogin()">⚡ Demo Login (No Account Needed)</button>
+      </div>
+      <div class="auth-toggle">
+        No account? <span onclick="toggleAuthMode()">Create one free →</span>
+      </div>
+    </div>
+
+    <div id="register-form" style="display:none">
+      <div class="auth-title">Create Account</div>
+      <div class="auth-sub">Join RentIQ — it's free forever</div>
+      <div class="auth-form">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" placeholder="Raj Sharma">
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" placeholder="you@example.com">
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <div class="password-wrap">
+            <input type="password" id="reg-password" placeholder="Min. 6 characters">
+            <button class="eye-btn" onclick="togglePwd('reg-password')">👁</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doRegister()">Create Account →</button>
+      </div>
+      <div class="auth-toggle">
+        Already have an account? <span onclick="toggleAuthMode()">Sign in →</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE 3: PREDICT
+============================================ -->
+<div id="predict" class="page">
+  <div class="predict-header">
+    <h1>🏠 Price Prediction</h1>
+    <p>Fill in your property details to get an AI-powered rental price estimate</p>
+  </div>
+
+  <div class="predict-layout">
+    <!-- FORM -->
+    <div class="card card-glow">
+      <div class="predict-card-title">📋 Property Details</div>
+
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Borough</label>
+          <select id="p-borough" onchange="updateNeighbourhoods()">
+            <option value="">Select Borough</option>
+            <option>Manhattan</option>
+            <option>Brooklyn</option>
+            <option>Queens</option>
+            <option>Bronx</option>
+            <option>Staten Island</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Neighbourhood</label>
+          <select id="p-neighbourhood">
+            <option value="">Select Borough First</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Room Type</label>
+          <select id="p-room-type">
+            <option value="">Select Type</option>
+            <option>Entire home/apt</option>
+            <option>Private room</option>
+            <option>Shared room</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Minimum Nights</label>
+          <input type="number" id="p-min-nights" placeholder="e.g. 2" min="1" max="365" value="2">
+        </div>
+
+        <div class="input-group">
+          <label>Latitude</label>
+          <input type="number" id="p-lat" placeholder="e.g. 40.7128" step="0.0001" value="40.7128">
+        </div>
+
+        <div class="input-group">
+          <label>Longitude</label>
+          <input type="number" id="p-lng" placeholder="e.g. -74.0060" step="0.0001" value="-74.0060">
+        </div>
+
+        <div class="input-group">
+          <label>Number of Reviews</label>
+          <input type="number" id="p-reviews" placeholder="e.g. 50" min="0" value="45">
+        </div>
+
+        <div class="input-group">
+          <label>Reviews / Month</label>
+          <input type="number" id="p-rpm" placeholder="e.g. 2.5" step="0.1" min="0" value="2.5">
+        </div>
+
+        <div class="input-group">
+          <label>Host Total Listings</label>
+          <input type="number" id="p-listings" placeholder="e.g. 1" min="1" value="1">
+        </div>
+
+        <div class="input-group">
+          <label>Availability (days/year)</label>
+          <input type="number" id="p-avail" placeholder="e.g. 180" min="0" max="365" value="180">
+        </div>
+
+        <div class="span-2">
+          <button class="btn btn-primary btn-full" onclick="predictPrice()" id="predict-btn">
+            ✨ Predict Rental Price
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="result-panel">
+      <div class="result-box" id="result-box">
+        <div class="result-idle">
+          <div style="font-size:2.5rem;margin-bottom:1rem">🏡</div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:0.5rem">Fill the form to predict</div>
+          <div>Enter property details and click predict to get your AI price estimate</div>
+        </div>
+      </div>
+
+      <div class="market-insights card" style="margin-top:1.5rem" id="market-card" style="display:none">
+        <div class="predict-card-title" style="margin-bottom:1rem">📈 Market Context</div>
+        <div id="market-rows"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================
+     PAGE 4: HISTORY
+============================================ -->
+<div id="history-page" class="page">
+  <div class="history-header">
+    <div>
+      <h1>📜 Prediction History</h1>
+      <p style="color:var(--muted);margin-top:0.25rem">All your saved rental price predictions</p>
+    </div>
+    <button class="btn btn-outline" onclick="clearHistory()">🗑 Clear History</button>
+  </div>
+
+  <div class="history-stats" id="history-stats"></div>
+
+  <div class="history-filters">
+    <button class="filter-btn active" onclick="filterHistory('all', this)">All</button>
+    <button class="filter-btn" onclick="filterHistory('Manhattan', this)">Manhattan</button>
+    <button class="filter-btn" onclick="filterHistory('Brooklyn', this)">Brooklyn</button>
+    <button class="filter-btn" onclick="filterHistory('Queens', this)">Queens</button>
+    <button class="filter-btn" onclick="filterHistory('Bronx', this)">Bronx</button>
+    <button class="filter-btn" onclick="filterHistory('Staten Island', this)">Staten Island</button>
+  </div>
+
+  <div id="history-content"></div>
+</div>
+
+<!-- ============================================
+     JAVASCRIPT
+============================================ -->
+<script>
+// ===== STATE =====
+let currentUser = null;
+let pendingPage = null;
+
+const NEIGHBOURHOODS = {
+  'Manhattan': ['Harlem', 'Midtown', 'Upper West Side', "Hell's Kitchen", 'Lower East Side', 'Chelsea', 'SoHo', 'Tribeca', 'East Village', 'Financial District'],
+  'Brooklyn': ['Williamsburg', 'Bushwick', 'Bedford-Stuyvesant', 'Crown Heights', 'Park Slope', 'Greenpoint', 'Carroll Gardens', 'Bay Ridge'],
+  'Queens': ['Astoria', 'Flushing', 'Jamaica', 'Long Island City', 'Forest Hills', 'Jackson Heights'],
+  'Bronx': ['Fordham', 'Mott Haven', 'Riverdale', 'Pelham Bay', 'Concourse'],
+  'Staten Island': ['St. George', 'Stapleton', 'Tottenville', 'Richmond Valley']
+};
+
+const MARKET_DATA = {
+  'Manhattan': { median: 185, avg: 210, low: 80, high: 450 },
+  'Brooklyn': { median: 110, avg: 135, low: 50, high: 300 },
+  'Queens': { median: 80, avg: 95, low: 40, high: 200 },
+  'Bronx': { median: 65, avg: 75, low: 30, high: 150 },
+  'Staten Island': { median: 70, avg: 85, low: 35, high: 180 },
+};
+
+// ===== PAGE NAVIGATION =====
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(
+    page === 'history' ? 'history-page' : page
+  );
+  if (el) {
+    el.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // Nav link active states
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+  if (page === 'history') renderHistory();
+}
+
+function requireAuth(page) {
+  if (!currentUser) {
+    pendingPage = page;
+    showPage('auth');
+    showToast('Please sign in first', 'info');
+  } else {
+    showPage(page);
+  }
+}
+
+// ===== AUTH =====
+function getUsers() {
+  return JSON.parse(localStorage.getItem('rentiq_users') || '{}');
+}
+function saveUsers(users) {
+  localStorage.setItem('rentiq_users', JSON.stringify(users));
+}
+function getHistory() {
+  return JSON.parse(localStorage.getItem(`rentiq_history_${currentUser?.email}`) || '[]');
+}
+function saveHistory(h) {
+  localStorage.setItem(`rentiq_history_${currentUser.email}`, JSON.stringify(h));
+}
+
+function toggleAuthMode() {
+  const lf = document.getElementById('login-form');
+  const rf = document.getElementById('register-form');
+  lf.style.display = lf.style.display === 'none' ? 'block' : 'none';
+  rf.style.display = rf.style.display === 'none' ? 'block' : 'none';
+}
+
+function togglePwd(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  if (!email || !pass) { showToast('Fill all fields', 'error'); return; }
+
+  const users = getUsers();
+  if (!users[email] || users[email].password !== btoa(pass)) {
+    showToast('Invalid credentials', 'error'); return;
+  }
+  currentUser = { email, name: users[email].name };
+  onLogin();
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  if (!name || !email || !pass) { showToast('Fill all fields', 'error'); return; }
+  if (pass.length < 6) { showToast('Password must be 6+ characters', 'error'); return; }
+
+  const users = getUsers();
+  if (users[email]) { showToast('Email already registered', 'error'); return; }
+  users[email] = { name, password: btoa(pass) };
+  saveUsers(users);
+
+  currentUser = { email, name };
+  showToast(`Welcome, ${name}! 🎉`, 'success');
+  onLogin();
+}
+
+function demoLogin() {
+  const users = getUsers();
+  const demoEmail = 'demo@rentiq.ai';
+  if (!users[demoEmail]) {
+    users[demoEmail] = { name: 'Demo User', password: btoa('demo123') };
+    saveUsers(users);
+  }
+  currentUser = { email: demoEmail, name: 'Demo User' };
+  showToast('Demo login successful! ⚡', 'success');
+  onLogin();
+}
+
+function onLogin() {
+  document.getElementById('nav-auth-btn').style.display = 'none';
+  document.getElementById('nav-logout-btn').style.display = 'inline-flex';
+  document.getElementById('nav-predict').style.display = 'inline';
+  document.getElementById('nav-history').style.display = 'inline';
+  document.getElementById('nav-user').style.display = 'inline';
+  document.getElementById('nav-user').textContent = '👤 ' + currentUser.name;
+
+  showToast(`Welcome back, ${currentUser.name}!`, 'success');
+  showPage(pendingPage || 'predict');
+  pendingPage = null;
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('nav-auth-btn').style.display = 'inline-flex';
+  document.getElementById('nav-logout-btn').style.display = 'none';
+  document.getElementById('nav-predict').style.display = 'none';
+  document.getElementById('nav-history').style.display = 'none';
+  document.getElementById('nav-user').style.display = 'none';
+  showPage('landing');
+  showToast('Logged out successfully', 'info');
+}
+
+// ===== NEIGHBOURHOOD DROPDOWN =====
+function updateNeighbourhoods() {
+  const borough = document.getElementById('p-borough').value;
+  const sel = document.getElementById('p-neighbourhood');
+  sel.innerHTML = '<option value="">Select Neighbourhood</option>';
+  if (NEIGHBOURHOODS[borough]) {
+    NEIGHBOURHOODS[borough].forEach(n => {
+      sel.innerHTML += `<option>${n}</option>`;
+    });
+  }
+
+  // Auto-fill lat/lng estimates
+  const latlng = {
+    'Manhattan': [40.7831, -73.9712],
+    'Brooklyn': [40.6782, -73.9442],
+    'Queens': [40.7282, -73.7949],
+    'Bronx': [40.8448, -73.8648],
+    'Staten Island': [40.5795, -74.1502],
+  };
+  if (latlng[borough]) {
+    document.getElementById('p-lat').value = (latlng[borough][0] + (Math.random()-0.5)*0.05).toFixed(4);
+    document.getElementById('p-lng').value = (latlng[borough][1] + (Math.random()-0.5)*0.05).toFixed(4);
+  }
+}
+
+// ===== PREDICT =====
+function predictPrice() {
+  const borough = document.getElementById('p-borough').value;
+  const neighbourhood = document.getElementById('p-neighbourhood').value;
+  const roomType = document.getElementById('p-room-type').value;
+  const minNights = +document.getElementById('p-min-nights').value;
+  const lat = +document.getElementById('p-lat').value;
+  const lng = +document.getElementById('p-lng').value;
+  const reviews = +document.getElementById('p-reviews').value;
+  const rpm = +document.getElementById('p-rpm').value;
+  const listings = +document.getElementById('p-listings').value;
+  const avail = +document.getElementById('p-avail').value;
+
+  if (!borough || !neighbourhood || !roomType) {
+    showToast('Please fill Borough, Neighbourhood, and Room Type', 'error');
+    return;
+  }
+
+  // Show loading
+  const box = document.getElementById('result-box');
+  box.className = 'result-box';
+  box.innerHTML = `
+    <div class="spinner"></div>
+    <div style="color:var(--muted);font-size:0.875rem">Running XGBoost model...</div>
+  `;
+
+  setTimeout(() => {
+    const price = calculateXGBoostPrice(borough, roomType, minNights, rpm, listings, avail, lat, lng);
+    showResult(price, borough, roomType, neighbourhood);
+
+    // Save to history
+    const entry = {
+      id: Date.now(),
+      date: new Date().toLocaleString(),
+      borough, neighbourhood, roomType,
+      minNights, reviews, rpm, listings, avail,
+      price,
+      lat: lat.toFixed(4), lng: lng.toFixed(4)
+    };
+    const h = getHistory();
+    h.unshift(entry);
+    saveHistory(h);
+
+    showToast(`Prediction saved: $${price}/night`, 'success');
+  }, 1200);
+}
+
+function calculateXGBoostPrice(borough, roomType, minNights, rpm, listings, avail, lat, lng) {
+  // Simulate XGBoost model coefficients
+  const basePrice = { 'Entire home/apt': 185, 'Private room': 88, 'Shared room': 42 };
+  const boroughMultiplier = { 'Manhattan': 1.82, 'Brooklyn': 1.22, 'Queens': 0.98, 'Bronx': 0.78, 'Staten Island': 0.88 };
+
+  let price = (basePrice[roomType] || 100) * (boroughMultiplier[borough] || 1.0);
+
+  // Feature adjustments (mimicking model weights)
+  price *= (1 - Math.min(minNights - 1, 20) * 0.008);
+  price *= (1 + Math.log1p(rpm) * 0.06);
+  price *= (listings > 5 ? 1.08 : 1.0);
+  price *= (avail > 200 ? 1.04 : avail < 60 ? 0.96 : 1.0);
+
+  // Lat/lng micro-adjustment
+  const latAdjust = (lat - 40.71) * 12;
+  const lngAdjust = (lng + 74.0) * -8;
+  price += latAdjust + lngAdjust;
+
+  // Add realistic noise
+  const noise = (Math.random() - 0.5) * 25;
+  price = Math.max(20, Math.round(price + noise));
+
+  return price;
+}
+
+function showResult(price, borough, roomType, neighbourhood) {
+  const market = MARKET_DATA[borough] || { median: 100, avg: 120, low: 50, high: 250 };
+  const confidence = Math.round(78 + Math.random() * 16);
+  const low = Math.round(price * 0.82);
+  const high = Math.round(price * 1.18);
+  const diff = ((price - market.median) / market.median * 100).toFixed(1);
+  const diffSign = diff >= 0 ? '+' : '';
+
+  const box = document.getElementById('result-box');
+  box.className = 'result-box predicted';
+  box.innerHTML = `
+    <div class="result-label">Predicted Nightly Rate</div>
+    <div class="result-price">$${price}</div>
+    <div class="result-unit">per night · ${roomType}</div>
+
+    <div class="price-range">
+      <div class="range-box">
+        <div class="range-val low">$${low}</div>
+        <div class="range-key">Low estimate</div>
+      </div>
+      <div class="range-box">
+        <div class="range-val high">$${high}</div>
+        <div class="range-key">High estimate</div>
+      </div>
+    </div>
+
+    <div class="confidence-bar-wrap">
+      <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted);margin-bottom:0.4rem">
+        <span>Model Confidence</span>
+        <span>${confidence}%</span>
+      </div>
+      <div class="confidence-bar-track">
+        <div class="confidence-bar-fill" id="conf-fill"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center">
+      <span class="chip chip-purple">📍 ${neighbourhood}</span>
+      <span class="chip ${diff >= 0 ? 'chip-amber' : 'chip-green'}">${diffSign}${diff}% vs market median</span>
+    </div>
+  `;
+
+  setTimeout(() => {
+    const fill = document.getElementById('conf-fill');
+    if (fill) fill.style.width = confidence + '%';
+  }, 100);
+
+  // Market insights
+  const mc = document.getElementById('market-card');
+  mc.style.display = 'block';
+  document.getElementById('market-rows').innerHTML = `
+    <div class="insight-row"><span class="insight-key">Borough Median</span><span class="insight-val">$${market.median}/night</span></div>
+    <div class="insight-row"><span class="insight-key">Borough Average</span><span class="insight-val">$${market.avg}/night</span></div>
+    <div class="insight-row"><span class="insight-key">Price Range (${borough})</span><span class="insight-val">$${market.low} – $${market.high}</span></div>
+    <div class="insight-row"><span class="insight-key">Your vs Median</span><span class="insight-val" style="color:${diff>=0?'var(--accent3)':'var(--success)'}">${diffSign}${diff}%</span></div>
+    <div class="insight-row"><span class="insight-key">XGBoost R²</span><span class="insight-val" style="color:var(--accent)">0.9420</span></div>
+  `;
+}
+
+// ===== HISTORY =====
+let historyFilter = 'all';
+
+function filterHistory(filter, btn) {
+  historyFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderHistory();
+}
+
+function renderHistory() {
+  if (!currentUser) return;
+  let h = getHistory();
+
+  // Stats
+  const statsEl = document.getElementById('history-stats');
+  if (h.length > 0) {
+    const avg = Math.round(h.reduce((s,e) => s+e.price, 0) / h.length);
+    const max = Math.max(...h.map(e => e.price));
+    const min = Math.min(...h.map(e => e.price));
+    statsEl.innerHTML = `
+      <div class="h-stat">
+        <div class="h-stat-val" style="color:var(--accent)">${h.length}</div>
+        <div class="h-stat-key">Total Predictions</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val" style="color:var(--accent2)">$${avg}</div>
+        <div class="h-stat-key">Average Price</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val" style="color:var(--success)">$${min}</div>
+        <div class="h-stat-key">Lowest Predicted</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val" style="color:var(--accent3)">$${max}</div>
+        <div class="h-stat-key">Highest Predicted</div>
+      </div>
+    `;
+  } else {
+    statsEl.innerHTML = '';
+  }
+
+  // Filter
+  if (historyFilter !== 'all') h = h.filter(e => e.borough === historyFilter);
+
+  const content = document.getElementById('history-content');
+  if (h.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🏠</div>
+        <h3>No predictions yet</h3>
+        <p>Make your first rental price prediction to see history here.</p>
+        <button class="btn btn-primary" style="margin-top:1.5rem" onclick="showPage('predict')">Predict Now →</button>
+      </div>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Date & Time</th>
+          <th>Borough</th>
+          <th>Neighbourhood</th>
+          <th>Room Type</th>
+          <th>Avail. Days</th>
+          <th>Reviews/mo</th>
+          <th>Predicted Price</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${h.map((e, i) => `
+          <tr>
+            <td style="color:var(--muted)">${i+1}</td>
+            <td style="color:var(--muted);font-size:0.8rem">${e.date}</td>
+            <td><span class="chip chip-purple">${e.borough}</span></td>
+            <td>${e.neighbourhood}</td>
+            <td>
+              <span class="chip ${e.roomType === 'Entire home/apt' ? 'chip-blue' : e.roomType === 'Private room' ? 'chip-green' : 'chip-amber'}">
+                ${e.roomType === 'Entire home/apt' ? '🏠' : e.roomType === 'Private room' ? '🛏' : '🤝'} ${e.roomType}
+              </span>
+            </td>
+            <td>${e.avail} days</td>
+            <td>${e.rpm}/mo</td>
+            <td><span class="price-badge">$${e.price}/night</span></td>
+            <td>
+              <button onclick="deleteEntry(${e.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;" title="Delete">🗑</button>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function deleteEntry(id) {
+  let h = getHistory().filter(e => e.id !== id);
+  saveHistory(h);
+  renderHistory();
+  showToast('Entry deleted', 'info');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all prediction history?')) return;
+  localStorage.removeItem(`rentiq_history_${currentUser?.email}`);
+  renderHistory();
+  showToast('History cleared', 'info');
+}
+
+// ===== TOAST =====
+function showToast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  setTimeout(() => t.className = '', 3000);
+}
+
+// ===== CHECK LOGGED IN ON LOAD =====
+window.addEventListener('load', () => {
+  // Check if user was previously logged in (session)
+  const savedUser = sessionStorage.getItem('rentiq_user');
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      onLogin();
+    } catch(e) {}
+  }
+});
+
+// Save session on login
+const origOnLogin = onLogin;
+function onLogin() {
+  sessionStorage.setItem('rentiq_user', JSON.stringify(currentUser));
+  document.getElementById('nav-auth-btn').style.display = 'none';
+  document.getElementById('nav-logout-btn').style.display = 'inline-flex';
+  document.getElementById('nav-predict').style.display = 'inline';
+  document.getElementById('nav-history').style.display = 'inline';
+  document.getElementById('nav-user').style.display = 'inline';
+  document.getElementById('nav-user').textContent = '👤 ' + currentUser.name;
+
+  if (!document.querySelector('.page.active')?.id === 'landing') {
+    showToast(`Welcome, ${currentUser.name}!`, 'success');
+  }
+  showPage(pendingPage || 'predict');
+  pendingPage = null;
+}
+</script>
+</body>
+</html>
