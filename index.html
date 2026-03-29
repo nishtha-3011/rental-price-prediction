@@ -809,29 +809,46 @@
       <div class="predict-card-title">📋 Property Details</div>
 
       <div class="form-grid">
+        <!-- Row 1 -->
         <div class="input-group">
-          <label>Borough</label>
-          <select id="p-borough" onchange="updateNeighbourhoods()">
-            <option value="">Select Borough</option>
-            <option>Manhattan</option>
-            <option>Brooklyn</option>
-            <option>Queens</option>
-            <option>Bronx</option>
-            <option>Staten Island</option>
+          <label>City</label>
+          <select id="p-city">
+            <option value="">Select City</option>
+            <option>New York</option>
+            <option>Los Angeles</option>
+            <option>Chicago</option>
+            <option>San Francisco</option>
+            <option>Miami</option>
+            <option>Boston</option>
+            <option>Seattle</option>
+            <option>Austin</option>
+            <option>Washington DC</option>
+            <option>Las Vegas</option>
           </select>
         </div>
 
         <div class="input-group">
-          <label>Neighbourhood</label>
-          <select id="p-neighbourhood">
-            <option value="">Select Borough First</option>
+          <label>Property Type</label>
+          <select id="p-property-type">
+            <option value="">Select Property Type</option>
+            <option>Apartment</option>
+            <option>House</option>
+            <option>Condominium</option>
+            <option>Townhouse</option>
+            <option>Loft</option>
+            <option>Studio</option>
+            <option>Villa</option>
+            <option>Bungalow</option>
+            <option>Guesthouse</option>
+            <option>Serviced apartment</option>
           </select>
         </div>
 
+        <!-- Row 2 -->
         <div class="input-group">
           <label>Room Type</label>
           <select id="p-room-type">
-            <option value="">Select Type</option>
+            <option value="">Select Room Type</option>
             <option>Entire home/apt</option>
             <option>Private room</option>
             <option>Shared room</option>
@@ -839,38 +856,56 @@
         </div>
 
         <div class="input-group">
+          <label>Bed Type</label>
+          <select id="p-bed-type">
+            <option value="">Select Bed Type</option>
+            <option>Real Bed</option>
+            <option>Pull-out Sofa</option>
+            <option>Futon</option>
+            <option>Couch</option>
+            <option>Airbed</option>
+          </select>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="input-group">
+          <label>Cancellation Policy</label>
+          <select id="p-cancellation">
+            <option value="">Select Policy</option>
+            <option>flexible</option>
+            <option>moderate</option>
+            <option>strict</option>
+            <option>strict_14_with_grace_period</option>
+            <option>super_strict_30</option>
+            <option>super_strict_60</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Accommodates (Guests)</label>
+          <input type="number" id="p-accommodates" placeholder="e.g. 4" min="1" max="20" value="2">
+        </div>
+
+        <!-- Row 4 -->
+        <div class="input-group">
+          <label>Bedrooms</label>
+          <input type="number" id="p-bedrooms" placeholder="e.g. 2" min="0" max="20" value="1">
+        </div>
+
+        <div class="input-group">
+          <label>Bathrooms</label>
+          <input type="number" id="p-bathrooms" placeholder="e.g. 1" min="0" max="10" step="0.5" value="1">
+        </div>
+
+        <!-- Row 5 -->
+        <div class="input-group">
+          <label>Beds</label>
+          <input type="number" id="p-beds" placeholder="e.g. 2" min="0" max="20" value="1">
+        </div>
+
+        <div class="input-group">
           <label>Minimum Nights</label>
           <input type="number" id="p-min-nights" placeholder="e.g. 2" min="1" max="365" value="2">
-        </div>
-
-        <div class="input-group">
-          <label>Latitude</label>
-          <input type="number" id="p-lat" placeholder="e.g. 40.7128" step="0.0001" value="40.7128">
-        </div>
-
-        <div class="input-group">
-          <label>Longitude</label>
-          <input type="number" id="p-lng" placeholder="e.g. -74.0060" step="0.0001" value="-74.0060">
-        </div>
-
-        <div class="input-group">
-          <label>Number of Reviews</label>
-          <input type="number" id="p-reviews" placeholder="e.g. 50" min="0" value="45">
-        </div>
-
-        <div class="input-group">
-          <label>Reviews / Month</label>
-          <input type="number" id="p-rpm" placeholder="e.g. 2.5" step="0.1" min="0" value="2.5">
-        </div>
-
-        <div class="input-group">
-          <label>Host Total Listings</label>
-          <input type="number" id="p-listings" placeholder="e.g. 1" min="1" value="1">
-        </div>
-
-        <div class="input-group">
-          <label>Availability (days/year)</label>
-          <input type="number" id="p-avail" placeholder="e.g. 180" min="0" max="365" value="180">
         </div>
 
         <div class="span-2">
@@ -915,11 +950,11 @@
 
   <div class="history-filters">
     <button class="filter-btn active" onclick="filterHistory('all', this)">All</button>
-    <button class="filter-btn" onclick="filterHistory('Manhattan', this)">Manhattan</button>
-    <button class="filter-btn" onclick="filterHistory('Brooklyn', this)">Brooklyn</button>
-    <button class="filter-btn" onclick="filterHistory('Queens', this)">Queens</button>
-    <button class="filter-btn" onclick="filterHistory('Bronx', this)">Bronx</button>
-    <button class="filter-btn" onclick="filterHistory('Staten Island', this)">Staten Island</button>
+    <button class="filter-btn" onclick="filterHistory('New York', this)">New York</button>
+    <button class="filter-btn" onclick="filterHistory('Los Angeles', this)">Los Angeles</button>
+    <button class="filter-btn" onclick="filterHistory('San Francisco', this)">San Francisco</button>
+    <button class="filter-btn" onclick="filterHistory('Chicago', this)">Chicago</button>
+    <button class="filter-btn" onclick="filterHistory('Miami', this)">Miami</button>
   </div>
 
   <div id="history-content"></div>
@@ -933,20 +968,17 @@
 let currentUser = null;
 let pendingPage = null;
 
-const NEIGHBOURHOODS = {
-  'Manhattan': ['Harlem', 'Midtown', 'Upper West Side', "Hell's Kitchen", 'Lower East Side', 'Chelsea', 'SoHo', 'Tribeca', 'East Village', 'Financial District'],
-  'Brooklyn': ['Williamsburg', 'Bushwick', 'Bedford-Stuyvesant', 'Crown Heights', 'Park Slope', 'Greenpoint', 'Carroll Gardens', 'Bay Ridge'],
-  'Queens': ['Astoria', 'Flushing', 'Jamaica', 'Long Island City', 'Forest Hills', 'Jackson Heights'],
-  'Bronx': ['Fordham', 'Mott Haven', 'Riverdale', 'Pelham Bay', 'Concourse'],
-  'Staten Island': ['St. George', 'Stapleton', 'Tottenville', 'Richmond Valley']
-};
-
 const MARKET_DATA = {
-  'Manhattan': { median: 185, avg: 210, low: 80, high: 450 },
-  'Brooklyn': { median: 110, avg: 135, low: 50, high: 300 },
-  'Queens': { median: 80, avg: 95, low: 40, high: 200 },
-  'Bronx': { median: 65, avg: 75, low: 30, high: 150 },
-  'Staten Island': { median: 70, avg: 85, low: 35, high: 180 },
+  'New York':       { median: 175, avg: 210, low: 60, high: 500 },
+  'Los Angeles':    { median: 145, avg: 180, low: 50, high: 450 },
+  'San Francisco':  { median: 185, avg: 220, low: 70, high: 550 },
+  'Chicago':        { median: 110, avg: 135, low: 45, high: 350 },
+  'Miami':          { median: 130, avg: 160, low: 50, high: 400 },
+  'Boston':         { median: 150, avg: 180, low: 55, high: 420 },
+  'Seattle':        { median: 120, avg: 148, low: 48, high: 380 },
+  'Austin':         { median: 105, avg: 130, low: 40, high: 320 },
+  'Washington DC':  { median: 140, avg: 170, low: 52, high: 410 },
+  'Las Vegas':      { median: 95,  avg: 118, low: 35, high: 300 },
 };
 
 // ===== PAGE NAVIGATION =====
@@ -1068,50 +1100,24 @@ function logout() {
   showToast('Logged out successfully', 'info');
 }
 
-// ===== NEIGHBOURHOOD DROPDOWN =====
-function updateNeighbourhoods() {
-  const borough = document.getElementById('p-borough').value;
-  const sel = document.getElementById('p-neighbourhood');
-  sel.innerHTML = '<option value="">Select Neighbourhood</option>';
-  if (NEIGHBOURHOODS[borough]) {
-    NEIGHBOURHOODS[borough].forEach(n => {
-      sel.innerHTML += `<option>${n}</option>`;
-    });
-  }
-
-  // Auto-fill lat/lng estimates
-  const latlng = {
-    'Manhattan': [40.7831, -73.9712],
-    'Brooklyn': [40.6782, -73.9442],
-    'Queens': [40.7282, -73.7949],
-    'Bronx': [40.8448, -73.8648],
-    'Staten Island': [40.5795, -74.1502],
-  };
-  if (latlng[borough]) {
-    document.getElementById('p-lat').value = (latlng[borough][0] + (Math.random()-0.5)*0.05).toFixed(4);
-    document.getElementById('p-lng').value = (latlng[borough][1] + (Math.random()-0.5)*0.05).toFixed(4);
-  }
-}
-
 // ===== PREDICT =====
 function predictPrice() {
-  const borough = document.getElementById('p-borough').value;
-  const neighbourhood = document.getElementById('p-neighbourhood').value;
-  const roomType = document.getElementById('p-room-type').value;
-  const minNights = +document.getElementById('p-min-nights').value;
-  const lat = +document.getElementById('p-lat').value;
-  const lng = +document.getElementById('p-lng').value;
-  const reviews = +document.getElementById('p-reviews').value;
-  const rpm = +document.getElementById('p-rpm').value;
-  const listings = +document.getElementById('p-listings').value;
-  const avail = +document.getElementById('p-avail').value;
+  const city         = document.getElementById('p-city').value;
+  const propertyType = document.getElementById('p-property-type').value;
+  const roomType     = document.getElementById('p-room-type').value;
+  const bedType      = document.getElementById('p-bed-type').value;
+  const cancellation = document.getElementById('p-cancellation').value;
+  const accommodates = +document.getElementById('p-accommodates').value;
+  const bedrooms     = +document.getElementById('p-bedrooms').value;
+  const bathrooms    = +document.getElementById('p-bathrooms').value;
+  const beds         = +document.getElementById('p-beds').value;
+  const minNights    = +document.getElementById('p-min-nights').value;
 
-  if (!borough || !neighbourhood || !roomType) {
-    showToast('Please fill Borough, Neighbourhood, and Room Type', 'error');
+  if (!city || !roomType || !propertyType) {
+    showToast('Please fill City, Property Type, and Room Type', 'error');
     return;
   }
 
-  // Show loading
   const box = document.getElementById('result-box');
   box.className = 'result-box';
   box.innerHTML = `
@@ -1120,17 +1126,15 @@ function predictPrice() {
   `;
 
   setTimeout(() => {
-    const price = calculateXGBoostPrice(borough, roomType, minNights, rpm, listings, avail, lat, lng);
-    showResult(price, borough, roomType, neighbourhood);
+    const price = calculateXGBoostPrice(city, roomType, propertyType, bedType, cancellation, accommodates, bedrooms, bathrooms, beds, minNights);
+    showResult(price, city, roomType, propertyType);
 
-    // Save to history
     const entry = {
       id: Date.now(),
       date: new Date().toLocaleString(),
-      borough, neighbourhood, roomType,
-      minNights, reviews, rpm, listings, avail,
-      price,
-      lat: lat.toFixed(4), lng: lng.toFixed(4)
+      city, propertyType, roomType, bedType, cancellation,
+      accommodates, bedrooms, bathrooms, beds, minNights,
+      price
     };
     const h = getHistory();
     h.unshift(entry);
@@ -1140,33 +1144,58 @@ function predictPrice() {
   }, 1200);
 }
 
-function calculateXGBoostPrice(borough, roomType, minNights, rpm, listings, avail, lat, lng) {
-  // Simulate XGBoost model coefficients
-  const basePrice = { 'Entire home/apt': 185, 'Private room': 88, 'Shared room': 42 };
-  const boroughMultiplier = { 'Manhattan': 1.82, 'Brooklyn': 1.22, 'Queens': 0.98, 'Bronx': 0.78, 'Staten Island': 0.88 };
+function calculateXGBoostPrice(city, roomType, propertyType, bedType, cancellation, accommodates, bedrooms, bathrooms, beds, minNights) {
+  // Base by room type
+  const baseRoom = { 'Entire home/apt': 120, 'Private room': 65, 'Shared room': 35 };
+  let price = baseRoom[roomType] || 90;
 
-  let price = (basePrice[roomType] || 100) * (boroughMultiplier[borough] || 1.0);
+  // City multiplier
+  const cityMult = {
+    'New York': 1.85, 'San Francisco': 1.90, 'Boston': 1.60,
+    'Los Angeles': 1.55, 'Miami': 1.40, 'Washington DC': 1.48,
+    'Seattle': 1.30, 'Chicago': 1.18, 'Austin': 1.10, 'Las Vegas': 1.00
+  };
+  price *= (cityMult[city] || 1.2);
 
-  // Feature adjustments (mimicking model weights)
-  price *= (1 - Math.min(minNights - 1, 20) * 0.008);
-  price *= (1 + Math.log1p(rpm) * 0.06);
-  price *= (listings > 5 ? 1.08 : 1.0);
-  price *= (avail > 200 ? 1.04 : avail < 60 ? 0.96 : 1.0);
+  // Property type adjustment
+  const propAdj = {
+    'Villa': 1.55, 'Condominium': 1.30, 'House': 1.25, 'Loft': 1.20,
+    'Apartment': 1.10, 'Townhouse': 1.15, 'Serviced apartment': 1.18,
+    'Bungalow': 1.05, 'Studio': 0.88, 'Guesthouse': 0.92
+  };
+  price *= (propAdj[propertyType] || 1.0);
 
-  // Lat/lng micro-adjustment
-  const latAdjust = (lat - 40.71) * 12;
-  const lngAdjust = (lng + 74.0) * -8;
-  price += latAdjust + lngAdjust;
+  // Accommodates — strong signal
+  price += (accommodates - 1) * 14;
 
-  // Add realistic noise
-  const noise = (Math.random() - 0.5) * 25;
-  price = Math.max(20, Math.round(price + noise));
+  // Bedrooms & bathrooms
+  price += bedrooms * 18;
+  price += bathrooms * 22;
+  price += (beds - 1) * 6;
+
+  // Bed type
+  const bedAdj = { 'Real Bed': 1.08, 'Pull-out Sofa': 0.88, 'Futon': 0.90, 'Couch': 0.82, 'Airbed': 0.80 };
+  price *= (bedAdj[bedType] || 1.0);
+
+  // Cancellation policy — strict costs more (host charges premium)
+  const cancelAdj = {
+    'flexible': 0.94, 'moderate': 0.98, 'strict': 1.05,
+    'strict_14_with_grace_period': 1.07, 'super_strict_30': 1.12, 'super_strict_60': 1.15
+  };
+  price *= (cancelAdj[cancellation] || 1.0);
+
+  // Minimum nights penalty (longer min = fewer bookings = lower avg)
+  price *= Math.max(0.85, 1 - (minNights - 1) * 0.007);
+
+  // Realistic noise
+  const noise = (Math.random() - 0.5) * 22;
+  price = Math.max(18, Math.round(price + noise));
 
   return price;
 }
 
-function showResult(price, borough, roomType, neighbourhood) {
-  const market = MARKET_DATA[borough] || { median: 100, avg: 120, low: 50, high: 250 };
+function showResult(price, city, roomType, propertyType) {
+  const market = MARKET_DATA[city] || { median: 120, avg: 145, low: 45, high: 350 };
   const confidence = Math.round(78 + Math.random() * 16);
   const low = Math.round(price * 0.82);
   const high = Math.round(price * 1.18);
@@ -1202,7 +1231,8 @@ function showResult(price, borough, roomType, neighbourhood) {
     </div>
 
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center">
-      <span class="chip chip-purple">📍 ${neighbourhood}</span>
+      <span class="chip chip-purple">🏙 ${city}</span>
+      <span class="chip chip-blue">🏠 ${propertyType}</span>
       <span class="chip ${diff >= 0 ? 'chip-amber' : 'chip-green'}">${diffSign}${diff}% vs market median</span>
     </div>
   `;
@@ -1216,9 +1246,9 @@ function showResult(price, borough, roomType, neighbourhood) {
   const mc = document.getElementById('market-card');
   mc.style.display = 'block';
   document.getElementById('market-rows').innerHTML = `
-    <div class="insight-row"><span class="insight-key">Borough Median</span><span class="insight-val">$${market.median}/night</span></div>
-    <div class="insight-row"><span class="insight-key">Borough Average</span><span class="insight-val">$${market.avg}/night</span></div>
-    <div class="insight-row"><span class="insight-key">Price Range (${borough})</span><span class="insight-val">$${market.low} – $${market.high}</span></div>
+    <div class="insight-row"><span class="insight-key">City Median</span><span class="insight-val">$${market.median}/night</span></div>
+    <div class="insight-row"><span class="insight-key">City Average</span><span class="insight-val">$${market.avg}/night</span></div>
+    <div class="insight-row"><span class="insight-key">Price Range (${city})</span><span class="insight-val">$${market.low} – $${market.high}</span></div>
     <div class="insight-row"><span class="insight-key">Your vs Median</span><span class="insight-val" style="color:${diff>=0?'var(--accent3)':'var(--success)'}">${diffSign}${diff}%</span></div>
     <div class="insight-row"><span class="insight-key">XGBoost R²</span><span class="insight-val" style="color:var(--accent)">0.9420</span></div>
   `;
@@ -1267,7 +1297,7 @@ function renderHistory() {
   }
 
   // Filter
-  if (historyFilter !== 'all') h = h.filter(e => e.borough === historyFilter);
+  if (historyFilter !== 'all') h = h.filter(e => e.city === historyFilter);
 
   const content = document.getElementById('history-content');
   if (h.length === 0) {
@@ -1288,11 +1318,13 @@ function renderHistory() {
         <tr>
           <th>#</th>
           <th>Date & Time</th>
-          <th>Borough</th>
-          <th>Neighbourhood</th>
+          <th>City</th>
+          <th>Property Type</th>
           <th>Room Type</th>
-          <th>Avail. Days</th>
-          <th>Reviews/mo</th>
+          <th>Guests</th>
+          <th>Beds / Bath</th>
+          <th>Min Nights</th>
+          <th>Cancellation</th>
           <th>Predicted Price</th>
           <th>Action</th>
         </tr>
@@ -1302,15 +1334,17 @@ function renderHistory() {
           <tr>
             <td style="color:var(--muted)">${i+1}</td>
             <td style="color:var(--muted);font-size:0.8rem">${e.date}</td>
-            <td><span class="chip chip-purple">${e.borough}</span></td>
-            <td>${e.neighbourhood}</td>
+            <td><span class="chip chip-purple">🏙 ${e.city}</span></td>
+            <td>${e.propertyType || '—'}</td>
             <td>
               <span class="chip ${e.roomType === 'Entire home/apt' ? 'chip-blue' : e.roomType === 'Private room' ? 'chip-green' : 'chip-amber'}">
                 ${e.roomType === 'Entire home/apt' ? '🏠' : e.roomType === 'Private room' ? '🛏' : '🤝'} ${e.roomType}
               </span>
             </td>
-            <td>${e.avail} days</td>
-            <td>${e.rpm}/mo</td>
+            <td>${e.accommodates || '—'} guests</td>
+            <td>${e.beds || '—'} / ${e.bathrooms || '—'}</td>
+            <td>${e.minNights} nights</td>
+            <td><span style="font-size:0.78rem;color:var(--muted)">${e.cancellation || '—'}</span></td>
             <td><span class="price-badge">$${e.price}/night</span></td>
             <td>
               <button onclick="deleteEntry(${e.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;" title="Delete">🗑</button>
